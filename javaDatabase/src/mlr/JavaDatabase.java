@@ -2,6 +2,7 @@ package mlr;
 
 import java.util.List;
 
+
 import java.util.Scanner;
 
 public class JavaDatabase {
@@ -12,7 +13,7 @@ public class JavaDatabase {
 		
 		Scanner sc = new Scanner(System.in);
 		
-		DepartmentDAO dao = new DepartmentDAO();
+		IDepartmentServices service = new DepartmentServicesImp();
 		
 		while(flag) {
 			System.out.println("Welcome to DMS");
@@ -42,7 +43,18 @@ public class JavaDatabase {
 				dept1.setDname(dname1);
 				dept1.setLocation(location1);
 				
-				int count = dao.addDept(dept1);
+				boolean isValid = DepartmentServicesImp.dateValidation(dept1);
+				if(isValid == true) {
+					int count = service.addDept(dept1);
+					System.out.println(count+"record inserted");
+				}
+					
+					else {
+						System.out.println("Invalid input");
+					}
+				
+				
+				int count = service.addDept(dept1);
 				count++;
 				System.out.println(count+"records inserted");
 				break;
@@ -61,7 +73,7 @@ public class JavaDatabase {
 				dept2.setDname(dname2);
 				dept2.setLocation(location2);
 				
-				int count1 = dao.updateDept(dept2);
+				int count1 = service.updateDept(dept2);
 				count1++;
 				System.out.println(count1+"records updated");
 				
@@ -69,22 +81,37 @@ public class JavaDatabase {
 			case 3:
 				System.out.println("Enter Dept to delete one record");
 				int dno3 = sc.nextInt();
-				int count2 = dao.deleteDept(dno3);
+				int count2 = service.deleteDept(dno3);
 				count2++;
 				System.out.println(count2+"recored Deleted");
 				
-				
+				if(count2 == 0) {
+					try {
+					throw new DeptNotFoundException();
+				}
+					catch(Exception e) {
+						System.err.println("Dept Not Found");
+					}
+				}
 				break;
 			case 4:
 				System.out.println("Enter dno to select record");
 				int dno4 = sc.nextInt();
-				Department deptObj = dao.selectDept(dno4);
+				Department deptObj = service.selectDept(dno4);
 			
 				System.out.println(deptObj);
+				if(deptObj == null) {
+					try {
+					throw new DeptNotFoundException();
+				}
+					catch(Exception e) {
+						System.err.println("Dept Not Found");
+					}
+				}
 	
 				break;
 			case 5:
-				List<Department> list = dao.getAll();
+				List<Department> list = service.getAll();
 
 				for (Department department : list) {
 					System.out.println(department);
@@ -95,9 +122,12 @@ public class JavaDatabase {
 				break;
 			case 0:
 				flag = false;
-
+				DButil.closeConnection();
+				System.out.println("Thank you");
+				
+				break;
 			default:
-				System.out.println("invalid input");
+				System.err.println("invalid input");
 				break;
 			}
 		}

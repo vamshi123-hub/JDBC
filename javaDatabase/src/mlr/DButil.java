@@ -2,7 +2,9 @@ package mlr;
 
 import java.sql.Connection;
 
+
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DButil {
 
@@ -19,5 +21,14 @@ public class DButil {
 			e.printStackTrace();
 		}
 		return conn;
+	}
+	public static void closeConnection() {
+		Connection conn = getDBConnection();
+		try {
+			conn.close();
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
